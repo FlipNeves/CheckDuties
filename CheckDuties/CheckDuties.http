@@ -1,0 +1,6 @@
+@CheckDuties_HostAddress = http://localhost:5074
+
+GET {{CheckDuties_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
