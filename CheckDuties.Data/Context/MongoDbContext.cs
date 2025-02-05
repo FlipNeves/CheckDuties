@@ -10,13 +10,11 @@ public class MongoDbContext
 {
     public IMongoDatabase Db { get; set; }
 
-    public MongoDbContext(IConfiguration configuration)
+    public MongoDbContext(IMongoClient mongoClient, IConfiguration configuration)
     {
         try
         {
-            var settings = MongoClientSettings.FromUrl(new MongoUrl(configuration["ConnectionString"]));
-            var client = new MongoClient(settings);
-            Db = client.GetDatabase(configuration["DbName"]);
+            Db = mongoClient.GetDatabase(configuration["DbName"]);
             MapClasses();
         }
         catch (Exception ex) { throw new MongoException("It was not possible to just connect to MongoDb", ex); }
