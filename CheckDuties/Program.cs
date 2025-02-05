@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using CheckDuties.Users;
-
-using System.Text;
 using CheckDuties.Data.Context;
 using CheckDuties.App.Commands.UsersCommand.RegisterUserCommand;
 using CheckDuties.App.Commands.UsersCommand.LoginUserCommand;
+using CheckDuties.Domain.Interfaces.Repositories;
+using CheckDuties.Data.Repositories;
+using MongoDB.Driver;
 
 namespace CheckDuties;
 
@@ -21,8 +21,15 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        builder.Services.AddSingleton<MongoDbContext>();
+        builder.Services.AddSingleton<IMongoClient>(sp =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var settings = MongoClientSettings.FromUrl(new MongoUrl(configuration["ConnectionString"]));
+            return new MongoClient(settings);
+        });
 
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IDutyRepository, DutyRepository>();
         builder.Services.AddScoped<RegisterUserCommandHandler>();
         builder.Services.AddScoped<LoginUserCommandHandler>();
 
